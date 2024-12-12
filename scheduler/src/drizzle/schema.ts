@@ -2,9 +2,8 @@ import { boolean, index, integer, pgEnum, pgTable, text, timestamp, uuid } from 
 import { DAY_OF_WEEK_IN_ORDER } from "../data/constants";
 import { relations } from "drizzle-orm";
 
-const createdAt = timestamp("createdAt").notNull().defaultNow();
-const updatedAt = timestamp("createdAt")
-  .notNull()
+const createdAt = timestamp("createdAt").defaultNow();
+const updatedAt = timestamp("updatedAt")
   .defaultNow()
   .$onUpdate(() => new Date());
 

@@ -7,7 +7,9 @@ export default function NewEventPage() {
       <CardHeader>
         <CardTitle>New Event</CardTitle>
       </CardHeader>
-      <CardContent><EventForm></EventForm></CardContent>
+      <CardContent>
+        <EventForm />
+      </CardContent>
     </Card>
   );
 }
