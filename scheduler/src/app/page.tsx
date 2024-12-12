@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { ClerkProvider, SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { useEffect } from "react";
 
   
 export default async function Home() {

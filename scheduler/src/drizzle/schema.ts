@@ -7,6 +7,8 @@ const updatedAt = timestamp("createdAt")
   .notNull()
   .defaultNow()
   .$onUpdate(() => new Date());
+
+
 export const EventTable = pgTable(
   "events",
   {
@@ -21,6 +23,7 @@ export const EventTable = pgTable(
   },
   (table) => [index("clerUserIdIndex").on(table.clerkUserId)]
 );
+
 
 export const ScheduleTable = pgTable("schedules", {
   id: uuid("id").primaryKey().defaultRandom(),
