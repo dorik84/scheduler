@@ -64,7 +64,7 @@ export function EventForm() {
 
         <FormField
           control={form.control}
-          name="description"
+          name="desc"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Duration</FormLabel>
