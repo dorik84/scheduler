@@ -9,12 +9,19 @@ import { Button } from "../button";
 import Link from "next/link";
 import { Textarea } from "../textarea";
 import { Switch } from "../switch";
-import { CreateEvent } from "@/server/actions/events";
+import { createEvent, updateEvent } from "@/server/actions/events";
 
-export function EventForm() {
+export function EventForm({event}:{event?:{
+  id: string,
+  isActive: boolean,
+  name: string,
+  duration: number,
+  clerkUserId: string,
+  desc?: string
+}}) {
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
-    defaultValues: {
+    defaultValues: event ?? {
       isActive: true,
       duration: 30,
       name: "",
@@ -22,7 +29,8 @@ export function EventForm() {
   });
 
   async function onSubmit(values: z.infer<typeof eventFormSchema>) {
-    const data = await CreateEvent(values);
+    const action = event == null ? createEvent : updateEvent.bind(null,event.id);
+    const data = await action(values);
     if (data?.error) {
       form.setError("root", { message: "there was error saving your event" });
     }
@@ -69,7 +77,7 @@ export function EventForm() {
             <FormItem>
               <FormLabel>Duration</FormLabel>
               <FormControl>
-                <Textarea className="resize-none h-32" {...field} />
+                <Textarea className="resize-none h-32" {...field}/>
               </FormControl>
               <FormDescription>Optional description for an event</FormDescription>
               <FormMessage />

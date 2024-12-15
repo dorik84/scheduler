@@ -4,12 +4,13 @@ import { db } from "@/drizzle/db";
 import { EventTable } from "@/drizzle/schema";
 import { eventFormSchema } from "@/schema/events";
 import { auth } from "@clerk/nextjs/server";
+import { and, eq } from "drizzle-orm/sql/expressions/conditions";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
 const { userId } = await auth();
 
-export async function CreateEvent(unsafeData: z.infer<typeof eventFormSchema>): Promise<
+export async function createEvent(unsafeData: z.infer<typeof eventFormSchema>): Promise<
   | {
       error: boolean;
     }
@@ -19,5 +20,26 @@ export async function CreateEvent(unsafeData: z.infer<typeof eventFormSchema>): 
   if (!success || userId == null) return { error: true };
 
   await db.insert(EventTable).values({ ...data, clerkUserId: userId });
+  redirect("/events");
+}
+
+export async function updateEvent(
+  id,
+  unsafeData: z.infer<typeof eventFormSchema>
+): Promise<
+  | {
+      error: boolean;
+    }
+  | undefined
+> {
+  const { success, data } = eventFormSchema.safeParse(unsafeData);
+  if (!success || userId == null) return { error: true };
+
+  const { rowCount } = await db
+    .update(EventTable)
+    .set({ ...data })
+    .where(and(eq(EventTable.clerkUserId, userId), eq(EventTable.id, id)));
+
+  if (rowCount == 0) return { error: true };
   redirect("/events");
 }
