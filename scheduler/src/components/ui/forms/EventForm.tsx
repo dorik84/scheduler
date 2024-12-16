@@ -9,16 +9,34 @@ import { Button } from "../button";
 import Link from "next/link";
 import { Textarea } from "../textarea";
 import { Switch } from "../switch";
-import { createEvent, updateEvent } from "@/server/actions/events";
+import { createEvent, deleteEvent, updateEvent } from "@/server/actions/events";
 
-export function EventForm({event}:{event?:{
-  id: string,
-  isActive: boolean,
-  name: string,
-  duration: number,
-  clerkUserId: string,
-  desc?: string
-}}) {
+import {
+  AlertDialogHeader,
+  AlertDialogCancel,
+  AlertDialogTrigger,
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+  AlertDialogFooter,
+  AlertDialogAction,
+} from "../alert-dialog";
+import { useTransition } from "react";
+
+export function EventForm({
+  event,
+}: {
+  event?: {
+    id: string;
+    isActive: boolean;
+    name: string;
+    duration: number;
+    clerkUserId: string;
+    desc?: string;
+  };
+}) {
+  const [isDeletePending, startDeleteTransition] = useTransition();
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
     defaultValues: event ?? {
@@ -29,7 +47,7 @@ export function EventForm({event}:{event?:{
   });
 
   async function onSubmit(values: z.infer<typeof eventFormSchema>) {
-    const action = event == null ? createEvent : updateEvent.bind(null,event.id);
+    const action = event == null ? createEvent : updateEvent.bind(null, event.id);
     const data = await action(values);
     if (data?.error) {
       form.setError("root", { message: "there was error saving your event" });
@@ -77,7 +95,7 @@ export function EventForm({event}:{event?:{
             <FormItem>
               <FormLabel>Duration</FormLabel>
               <FormControl>
-                <Textarea className="resize-none h-32" {...field}/>
+                <Textarea className="resize-none h-32" {...field} />
               </FormControl>
               <FormDescription>Optional description for an event</FormDescription>
               <FormMessage />
@@ -103,6 +121,38 @@ export function EventForm({event}:{event?:{
         ></FormField>
 
         <div className="flex gap-2 justify-end">
+          {event && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructiveGhost" disabled={isDeletePending || form.formState.isSubmitting}>
+                  Delete
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                </AlertDialogHeader>
+                <AlertDialogDescription>This action cannot be undone. This will permanently delete this event</AlertDialogDescription>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  disabled={isDeletePending || form.formState.isSubmitting}
+                  variant='destructiveGhost'
+                  onClick={() =>
+                    startDeleteTransition(async () => {
+                      const data = await deleteEvent(event.id);
+                      if (data?.error){
+                        form.setError("root", { message: "there was error deleting your event" });
+                      }
+                    })
+                  }
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
           <Button type="button" variant="outline" asChild>
             <Link href="/events">Cancel</Link>
           </Button>

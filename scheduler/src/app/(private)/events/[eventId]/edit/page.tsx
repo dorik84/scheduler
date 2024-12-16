@@ -4,6 +4,8 @@ import { db } from "@/drizzle/db";
 import { auth } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
 
+export const dynamic = 'force-dynamic';
+
 export default async function EditEventPage({params}:{params:{eventId:string}}) {
   const { eventId } = await params;
   const {userId, redirectToSignIn} = await auth()

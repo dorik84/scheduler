@@ -24,7 +24,7 @@ export async function createEvent(unsafeData: z.infer<typeof eventFormSchema>): 
 }
 
 export async function updateEvent(
-  id,
+  id: string,
   unsafeData: z.infer<typeof eventFormSchema>
 ): Promise<
   | {
@@ -40,6 +40,27 @@ export async function updateEvent(
     .set({ ...data })
     .where(and(eq(EventTable.clerkUserId, userId), eq(EventTable.id, id)));
 
+  if (rowCount == 0) return { error: true };
+  redirect("/events");
+}
+
+
+
+export async function deleteEvent(
+  id: string
+): Promise<
+  | {
+      error: boolean;
+    }
+  | undefined
+> {
+  console.log("deleteEvent triggered")
+  if (userId == null) return { error: true };
+
+  const { rowCount } = await db
+    .delete(EventTable)
+    .where(and(eq(EventTable.clerkUserId, userId), eq(EventTable.id, id)));
+  console.log(rowCount)
   if (rowCount == 0) return { error: true };
   redirect("/events");
 }
