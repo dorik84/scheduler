@@ -23,11 +23,20 @@ import {
   AlertDialogAction,
 } from "../alert-dialog";
 import { useTransition } from "react";
+import { DAY_OF_WEEK_IN_ORDER } from "@/data/constants";
 
-export function EventForm({
-  event,
+type Availability = {
+  startTime: string;
+  endTime: string;
+  dayOfWeek: (typeof DAY_OF_WEEK_IN_ORDER)[number];
+};
+
+export function ScheduleForm({
+  schedule,
 }: {
-  event?: {
+  schedule?: {
+    timezone: string;
+    availability: Availability[];
     id: string;
     isActive: boolean;
     name: string;
@@ -133,23 +142,23 @@ export function EventForm({
                   <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 </AlertDialogHeader>
                 <AlertDialogDescription>This action cannot be undone. This will permanently delete this event</AlertDialogDescription>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  disabled={isDeletePending || form.formState.isSubmitting}
-                  variant='destructiveGhost'
-                  onClick={() =>
-                    startDeleteTransition(async () => {
-                      const data = await deleteEvent(event.id);
-                      if (data?.error){
-                        form.setError("root", { message: "there was error deleting your event" });
-                      }
-                    })
-                  }
-                >
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    disabled={isDeletePending || form.formState.isSubmitting}
+                    variant="destructiveGhost"
+                    onClick={() =>
+                      startDeleteTransition(async () => {
+                        const data = await deleteEvent(event.id);
+                        if (data?.error) {
+                          form.setError("root", { message: "there was error deleting your event" });
+                        }
+                      })
+                    }
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
           )}
