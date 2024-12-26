@@ -133,30 +133,32 @@ export function EventForm({
                   <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 </AlertDialogHeader>
                 <AlertDialogDescription>This action cannot be undone. This will permanently delete this event</AlertDialogDescription>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  disabled={isDeletePending || form.formState.isSubmitting}
-                  variant='destructiveGhost'
-                  onClick={() =>
-                    startDeleteTransition(async () => {
-                      const data = await deleteEvent(event.id);
-                      if (data?.error){
-                        form.setError("root", { message: "there was error deleting your event" });
-                      }
-                    })
-                  }
-                >
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    disabled={isDeletePending || form.formState.isSubmitting}
+                    variant="destructiveGhost"
+                    onClick={() =>
+                      startDeleteTransition(async () => {
+                        const data = await deleteEvent(event.id);
+                        if (data?.error) {
+                          form.setError("root", { message: "there was error deleting your event" });
+                        }
+                      })
+                    }
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
           )}
-          <Button type="button" variant="outline" asChild>
+          <Button disabled={isDeletePending || form.formState.isSubmitting} type="button" variant="outline" asChild>
             <Link href="/events">Cancel</Link>
           </Button>
-          <Button type="submit">Submit</Button>
+          <Button disabled={isDeletePending || form.formState.isSubmitting} type="submit">
+            Submit
+          </Button>
         </div>
       </form>
     </Form>
