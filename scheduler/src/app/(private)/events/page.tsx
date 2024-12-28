@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { CopyEventButton } from "@/components/ui/CopyEventButton";
+import { EventButton } from "@/components/ui/EventButton";
+
 import { db } from "@/drizzle/db";
 import { formatEventDescription } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
@@ -9,8 +10,7 @@ import { desc } from "drizzle-orm";
 import { CalendarPlus, CalendarRange } from "lucide-react";
 import Link from "next/link";
 
-
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export default async function EventsPage() {
   const { userId, redirectToSignIn } = await auth();
   if (userId == null) redirectToSignIn();
@@ -63,16 +63,15 @@ type EventCardProps = {
 };
 
 function EventCard({ id, isActive, name, duration, clerkUserId, desc }: EventCardProps) {
-
   return (
     <Card className={cn("flex flex-col", !isActive && "border-secondary/50")}>
       <CardHeader className={cn(!isActive && "opacity-50")}>
         <CardTitle>{name}</CardTitle>
         <CardDescription>{formatEventDescription(duration)}</CardDescription>
       </CardHeader>
-      {desc != null && (<CardContent className={cn(!isActive && "opacity-50")}>{desc}</CardContent>)}
+      {desc != null && <CardContent className={cn(!isActive && "opacity-50")}>{desc}</CardContent>}
       <CardFooter className="flex justify-end gap-2 mt-auto">
-        {isActive && <CopyEventButton  variant="outline" eventId="id" clerkUserId={clerkUserId}/> }
+        {isActive && <EventButton variant="outline" eventId="id" clerkUserId={clerkUserId} />}
         <Button asChild>
           <Link href={`/events/${id}/edit`}>Edit</Link>
         </Button>

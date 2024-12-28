@@ -6,11 +6,7 @@ import { Copy, CopyCheck, CopyX } from "lucide-react";
 
 type CopyState = "idle" | "copied" | "error";
 
-export function CopyEventButton({
-  clerkUserId,
-  eventId,
-  ...buttonProps
-}: Omit<ButtonProps, "children" | "onClick"> & { eventId: string; clerkUserId: string }) {
+export function EventButton({ clerkUserId, eventId, ...buttonProps }: Omit<ButtonProps, "children" | "onClick"> & { eventId: string; clerkUserId: string }) {
   const [copyState, setCopyState] = useState<CopyState>("idle");
   const CopyIcon = getCopyIcon(copyState);
   return (
