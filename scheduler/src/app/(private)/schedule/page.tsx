@@ -4,6 +4,7 @@ import { ScheduleForm } from "@/components/ui/forms/ScheduleForm";
 import { db } from "@/drizzle/db";
 import { auth } from "@clerk/nextjs/server";
 
+export const dynamic = "force-dynamic";
 export default async function SchedulePage() {
   const { userId, redirectToSignIn } = await auth();
   if (userId == null) return redirectToSignIn();

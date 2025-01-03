@@ -120,7 +120,7 @@ export function ScheduleForm({
                           </FormItem>
                         )}
                       ></FormField>
-
+                      -
                       <FormField
                         control={form.control}
                         name={`availabilities.${field.index}.endTime`}
