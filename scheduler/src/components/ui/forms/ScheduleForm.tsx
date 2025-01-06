@@ -39,12 +39,27 @@ export function ScheduleForm({
     },
   });
 
-  const { append: appendAvailability, remove: removeAvailability, fields: availabilityFields } = useFieldArray({ name: "availabilities", control: form.control });
+  const {
+    append: appendAvailability,
+    remove: removeAvailability,
+    fields: availabilityFields,
+  } = useFieldArray({ name: "availabilities", control: form.control });
 
-  const groupedAvailabilityFields = Object.groupBy(
-    availabilityFields.map((field, index) => ({ ...field, index })),
-    (availability) => availability.dayOfWeek
-  );
+  // Object.groupBy doesnt work in older node version
+  // const groupedAvailabilityFields = Object.groupBy(
+  //   availabilityFields.map((field, index) => ({ ...field, index })),
+  //   (availability) => availability.dayOfWeek
+  // );
+
+  const arr = availabilityFields.map((field, index) => ({ ...field, index }));
+
+  const groupBy = (arr: typeof availabilityFields, key: string) => {
+    return arr.reduce((result, currentValue) => {
+      (result[currentValue[key]] = result[currentValue[key]] || []).push(currentValue);
+      return result;
+    }, {});
+  };
+  const groupedAvailabilityFields = groupBy(arr, "dayOfWeek");
 
   async function onSubmit(values: z.infer<typeof scheduleFormSchema>) {
     const data = await saveSchedule(values);
@@ -133,7 +148,12 @@ export function ScheduleForm({
                           </FormItem>
                         )}
                       ></FormField>
-                      <Button type="button" className="size-6 p-1" variant={"destructiveGhost"} onClick={() => removeAvailability(field.index)}>
+                      <Button
+                        type="button"
+                        className="size-6 p-1"
+                        variant={"destructiveGhost"}
+                        onClick={() => removeAvailability(field.index)}
+                      >
                         <X />
                       </Button>
                     </div>

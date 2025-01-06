@@ -71,7 +71,7 @@ function EventCard({ id, isActive, name, duration, clerkUserId, desc }: EventCar
       </CardHeader>
       {desc != null && <CardContent className={cn(!isActive && "opacity-50")}>{desc}</CardContent>}
       <CardFooter className="flex justify-end gap-2 mt-auto">
-        {isActive && <EventButton variant="outline" eventId="id" clerkUserId={clerkUserId} />}
+        {isActive && <EventButton variant="outline" eventId={id} clerkUserId={clerkUserId} />}
         <Button asChild>
           <Link href={`/events/${id}/edit`}>Edit</Link>
         </Button>

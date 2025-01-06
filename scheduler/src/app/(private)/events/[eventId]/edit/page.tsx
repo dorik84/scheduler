@@ -4,25 +4,25 @@ import { db } from "@/drizzle/db";
 import { auth } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
-export default async function EditEventPage({params}:{params:{eventId:string}}) {
-  const { eventId } = await params;
-  const {userId, redirectToSignIn} = await auth()
-  if(userId == null) return redirectToSignIn()
+export default async function EditEventPage({ params }: { params: { eventId: string } }) {
+  const { eventId } = params;
+  const { userId, redirectToSignIn } = await auth();
+  if (userId == null) return redirectToSignIn();
 
-    const event = await db.query.EventTable.findFirst({
-    where: ({id, clerkUserId}, {and,eq}) => and(eq( clerkUserId, userId ), eq(id,eventId)),
+  const event = await db.query.EventTable.findFirst({
+    where: ({ id, clerkUserId }, { and, eq }) => and(eq(clerkUserId, userId), eq(id, eventId)),
   });
 
-  if (event == null) return notFound()
+  if (event == null) return notFound();
   return (
     <Card className="max-w-md mx-auto">
       <CardHeader>
         <CardTitle>Edit Event</CardTitle>
       </CardHeader>
       <CardContent>
-        <EventForm event={{...event, desc:event.desc?? 'undefined'}}/>
+        <EventForm event={{ ...event, desc: event.desc ?? "undefined" }} />
       </CardContent>
     </Card>
   );
