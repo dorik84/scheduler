@@ -6,6 +6,7 @@ import { formatEventDescription } from "@/lib/formatters";
 import { clerkClient } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
 export default async function BookingPage({ params: { clerkUserId } }: { params: { clerkUserId: string } }) {
   const events = await db.query.EventTable.findMany({
     where: ({ clerkUserId: userIdCol, isActive }, { eq, and }) => and(eq(userIdCol, clerkUserId), eq(isActive, true)),
@@ -20,7 +21,9 @@ export default async function BookingPage({ params: { clerkUserId } }: { params:
   return (
     <div className="max-w-5xl mx-auto">
       <div className="text-4xl md:text-5xl font-semibold mb-4 text-center">{fullName}</div>
-      <div className="text-muted-foreground mb-6 max-w-sm mx-auto text-center">Welcome to the scheduler page. Please follow the instructions to add an event to my calendar.</div>
+      <div className="text-muted-foreground mb-6 max-w-sm mx-auto text-center">
+        Welcome to the scheduler page. Please follow the instructions to add an event to my calendar.
+      </div>
       <div className="grid gap-5 grid-cols-[repeat(auto-fill,minmax(300px,1fr))]">
         {events.map((event) => (
           <EventCard key={event.id} {...event}></EventCard>

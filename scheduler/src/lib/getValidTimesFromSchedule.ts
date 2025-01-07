@@ -21,6 +21,7 @@ import { fromZonedTime } from "date-fns-tz";
 export async function getValidTimesFromSchedule(timesInOrder: Date[], event: { clerkUserId: string; duration: number }) {
   const start = timesInOrder[0];
   const end = timesInOrder.at(-1);
+
   if (start == null || end == null) return [];
 
   const schedule = await db.query.ScheduleTable.findFirst({
@@ -28,7 +29,7 @@ export async function getValidTimesFromSchedule(timesInOrder: Date[], event: { c
     with: { availabilities: true },
   });
 
-  if (!schedule) return [];
+  if (schedule == null) return [];
   //Object.groupBy doesnt work in older node version
   // const groupedAvailablities = Object.groupBy(schedule.availabilities, (availability) => availability.dayOfWeek);
   const groupedAvailabilities = schedule.availabilities.reduce((acc, availability) => {
@@ -40,15 +41,23 @@ export async function getValidTimesFromSchedule(timesInOrder: Date[], event: { c
     return acc;
   }, {});
 
-  const eventTimes = await getCalendarEventTimes(event.clerkUserId, { start, end });
+  const eventTimes = await getCalendarEventTimes(event.clerkUserId, {
+    start,
+    end,
+  });
 
   return timesInOrder.filter((intervalDate) => {
     const availabilities = getAvailabilities(groupedAvailabilities, intervalDate, schedule.timezone);
-    const eventInterval = { start: intervalDate, end: addMinutes(intervalDate, event.duration) };
+    const eventInterval = {
+      start: intervalDate,
+      end: addMinutes(intervalDate, event.duration),
+    };
 
     return (
       eventTimes.every((eventTime) => {
-        if (!eventTime) return true;
+        if (!eventTime) {
+          return true;
+        }
         return !areIntervalsOverlapping(eventTime, eventInterval);
       }) &&
       availabilities.some((availability) => {
@@ -69,7 +78,7 @@ function getAvailabilities(
     availabilities = groupedAvailabilities.monday;
   }
   if (isTuesday(date)) {
-    availabilities = groupedAvailabilities.tuseday;
+    availabilities = groupedAvailabilities.tuesday;
   }
   if (isWednesday(date)) {
     availabilities = groupedAvailabilities.wednesday;
@@ -87,13 +96,13 @@ function getAvailabilities(
     availabilities = groupedAvailabilities.sunday;
   }
 
-  if (availabilities == null || availabilities.length === 0) {
-    return [];
-  }
+  if (availabilities == null) return [];
 
   return availabilities.map(({ startTime, endTime }) => {
     const start = fromZonedTime(setMinutes(setHours(date, parseInt(startTime.split(":")[0])), parseInt(startTime.split(":")[1])), timezone);
-    const end = fromZonedTime(setMinutes(setHours(date, parseInt(startTime.split(":")[0])), parseInt(endTime.split(":")[1])), timezone);
+
+    const end = fromZonedTime(setMinutes(setHours(date, parseInt(endTime.split(":")[0])), parseInt(endTime.split(":")[1])), timezone);
+
     return { start, end };
   });
 }
