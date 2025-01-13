@@ -17,21 +17,29 @@ import { Popover, PopoverContent, PopoverTrigger } from "../popover";
 import { Calendar } from "../calendar";
 import { isSameDay } from "date-fns";
 import { cn } from "@/lib/utils";
-import { toZonedTime } from "date-fns-tz";
+import { fromZonedTime } from "date-fns-tz";
 import { Input } from "../input";
 import { Textarea } from "../textarea";
 import { createMeeting } from "@/server/actions/meetings";
 
-export function MeetingForm({ validTimes, eventId, clerkUserId }: { validTimes: Date[]; eventId: string; clerkUserId: string }) {
+export function MeetingForm({
+  validTimes,
+  eventId,
+  clerkUserId,
+}: {
+  validTimes: Date[];
+  eventId: string;
+  clerkUserId: string;
+}) {
   const form = useForm<z.infer<typeof meetingFormSchema>>({
     resolver: zodResolver(meetingFormSchema),
-    defaultValues: { timezone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+    defaultValues: { timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, guestName: "", guestEmail: "" },
   });
 
   const timezone = form.watch("timezone");
   const date = form.watch("date");
   const validTimesInTimezone = useMemo(() => {
-    return validTimes.map((date) => toZonedTime(date, timezone));
+    return validTimes.map((date) => fromZonedTime(date, timezone));
   }, [validTimes, timezone]);
 
   async function onSubmit(values: z.infer<typeof meetingFormSchema>) {
@@ -44,7 +52,9 @@ export function MeetingForm({ validTimes, eventId, clerkUserId }: { validTimes: 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
-        {form.formState.errors.root && <div className="text-destructive text-sm">{form.formState.errors.root.message}</div>}
+        {form.formState.errors.root && (
+          <div className="text-destructive text-sm">{form.formState.errors.root.message}</div>
+        )}
         <FormField
           control={form.control}
           name="timezone"
@@ -83,7 +93,10 @@ export function MeetingForm({ validTimes, eventId, clerkUserId }: { validTimes: 
                     <FormControl>
                       <Button
                         variant="outline"
-                        className={cn("pl-3 text-left font-normal flex w-full", !field.value && "text-muted-foreground")}
+                        className={cn(
+                          "pl-3 text-left font-normal flex w-full",
+                          !field.value && "text-muted-foreground"
+                        )}
                       >
                         {field.value ? formatDate(field.value) : <span>Pick a date</span>}
                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
@@ -119,7 +132,9 @@ export function MeetingForm({ validTimes, eventId, clerkUserId }: { validTimes: 
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue
-                        placeholder={date == null || timezone == null ? "Select a date/timzone first." : "Select a meeting time"}
+                        placeholder={
+                          date == null || timezone == null ? "Select a date/timzone first." : "Select a meeting time"
+                        }
                       />
                     </SelectTrigger>
                   </FormControl>
